@@ -315,8 +315,9 @@ public abstract class SimpleWin
      */
     public JTextField match(Document d) {
         for (JTextField f : this.textFieldList) {
-            if (f.getDocument() == d)
+            if (f.getDocument() == d) {
                 return f;
+            }
         }
         return null;
     }
