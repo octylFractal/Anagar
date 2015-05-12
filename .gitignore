@@ -16,6 +16,7 @@ bin/
 # gradle
 .gradle/
 build/
+!gradle/wrapper/gradle-wrapper.jar
 
 # custom
 .build/
