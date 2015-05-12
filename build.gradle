@@ -29,7 +29,7 @@ apply plugin: 'aversion-maven'
 apply plugin: 'aversion-apt'
 
 util {
-    javaVersion = '1.8'
+    javaVersion = '1.7'
 }
 
 repositories {
