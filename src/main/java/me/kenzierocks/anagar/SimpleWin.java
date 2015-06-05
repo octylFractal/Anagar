@@ -28,25 +28,26 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
+import me.kenzierocks.anagar.Utility.GridConstraints;
+
 /**
  * A simple window base for Swing.
  * 
  * @author Kenzie Togami
  */
 @SuppressWarnings("serial")
-public abstract class SimpleWin
-        extends JFrame implements ActionListener, DocumentListener {
+public abstract class SimpleWin extends JFrame implements ActionListener,
+        DocumentListener {
+
     protected final List<JButton> buttonList = new ArrayList<JButton>();
-    protected final List<JTextField> textFieldList =
-            new ArrayList<JTextField>();
+    protected final List<JTextField> textFieldList = new ArrayList<JTextField>();
     protected final List<JLabel> labelList = new ArrayList<JLabel>();
-    protected final Map<Integer, Action> actionMap =
-            new HashMap<Integer, Action>();
+    protected final Map<Integer, Action> actionMap = new HashMap<Integer, Action>();
     /**
      * The GridBagConstraints used by the window.
      */
     public final GridBagConstraints gbc;
-    protected final JPanel internalPanel;
+    public final JPanel internalPanel;
 
     /**
      * This constructor must only be called by a subclass, never call this any
@@ -198,9 +199,8 @@ public abstract class SimpleWin
      * Active full screen mode for this window.
      */
     public void activateFullScreen() {
-        GraphicsDevice de =
-                GraphicsEnvironment.getLocalGraphicsEnvironment()
-                        .getDefaultScreenDevice();
+        GraphicsDevice de = GraphicsEnvironment.getLocalGraphicsEnvironment()
+                .getDefaultScreenDevice();
         if (isDisplayable()) {
             dispose();
         }
@@ -212,9 +212,8 @@ public abstract class SimpleWin
      * Deactivate full screen mode for this window.
      */
     public void deactivateFullScreen() {
-        GraphicsDevice de =
-                GraphicsEnvironment.getLocalGraphicsEnvironment()
-                        .getDefaultScreenDevice();
+        GraphicsDevice de = GraphicsEnvironment.getLocalGraphicsEnvironment()
+                .getDefaultScreenDevice();
         de.setFullScreenWindow(null);
         dispose();
         setUndecorated(false);
@@ -224,9 +223,9 @@ public abstract class SimpleWin
      * Set this window's size so it fills the screen.
      */
     public void maximizeSCreen() {
-        DisplayMode displayMode =
-                GraphicsEnvironment.getLocalGraphicsEnvironment()
-                        .getDefaultScreenDevice().getDisplayMode();
+        DisplayMode displayMode = GraphicsEnvironment
+                .getLocalGraphicsEnvironment().getDefaultScreenDevice()
+                .getDisplayMode();
         setSize(displayMode.getWidth(), displayMode.getHeight());
         setVisible(true);
     }
@@ -300,8 +299,8 @@ public abstract class SimpleWin
      *            - The height of the rigid area
      */
     public void addRigidArea(int width, int height) {
-        this.internalPanel.add(Box
-                .createRigidArea(new Dimension(width, height)), this.gbc);
+        this.internalPanel.add(
+                Box.createRigidArea(new Dimension(width, height)), this.gbc);
     }
 
     /**
@@ -328,7 +327,7 @@ public abstract class SimpleWin
     public void drop() {
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation((screen.width / 2) - this.getWidth() / 2,
-                         (screen.height / 2) - this.getHeight() / 2);
+                (screen.height / 2) - this.getHeight() / 2);
     }
 
     /**
@@ -340,8 +339,7 @@ public abstract class SimpleWin
      *            - The y coord
      */
     public void setCoords(int x, int y) {
-        this.gbc.gridx = x;
-        this.gbc.gridy = y;
+        new GridConstraints(this.gbc).setCoords(x, y);
     }
 
     /**
@@ -352,8 +350,7 @@ public abstract class SimpleWin
      * @see GridBagConstraints#anchor
      */
     public void setAnchor(int a) {
-        this.gbc.weightx = this.gbc.weighty = 1.0;
-        this.gbc.anchor = a;
+        new GridConstraints(this.gbc).setAnchor(a);
     }
 
     /**

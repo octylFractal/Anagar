@@ -8,11 +8,10 @@ import java.awt.event.WindowEvent;
  * 
  * @author Kenzie Togami
  */
-class WindowCloseHandler
-        extends WindowAdapter {
+class WindowCloseHandler extends WindowAdapter {
 
     @Override
-    public void windowClosed(WindowEvent e) {
+    public void windowClosing(WindowEvent e) {
         ((SimpleWin) e.getWindow()).onClose();
     }
 
