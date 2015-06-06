@@ -4,6 +4,6 @@ public interface LevelComponent {
 
     LevelGUIComponent getDisplayableBit();
     
-    HackGUIMetaData getMetaData();
+    HackData getMetaData();
     
 }

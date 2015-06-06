@@ -42,10 +42,10 @@ public interface StateType {
 
     enum Defaults {
 
-        MAIN(BaseStateType.builder().idAndDiscriminator("main").build()), LEVEL(
-                BaseStateType.builder().id("level").discriminator("none")
-                        .build()), PAUSE(BaseStateType.builder().id("pause")
-                .discriminator("none").build());
+        MAIN(BaseStateType.builder().idAndDiscriminator("main").build()),
+        LEVEL(BaseStateType.builder().id("level").discriminator("none").build()),
+        HACK(BaseStateType.builder().idAndDiscriminator("hack").build()),
+        PAUSE(BaseStateType.builder().id("pause").discriminator("none").build());
 
         private final BaseStateType stateType;
 

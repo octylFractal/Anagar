@@ -1,17 +1,6 @@
 package me.kenzierocks.anagar;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.Image;
-import java.awt.LayoutManager;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -25,7 +14,6 @@ import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import me.kenzierocks.anagar.functional.Consumer;
 import me.kenzierocks.anagar.state.State;
@@ -39,13 +27,14 @@ public final class Utility {
     public static final class Dim {
 
         public static Dimension requireSize(Dimension def, Dimension d) {
-            return new Dimension(Math.max(def.width, d.width), Math.max(
-                    def.height, d.height));
+            return new Dimension(Math.max(def.width, d.width),
+                    Math.max(def.height, d.height));
         }
 
     }
 
-    public static final class GridConstraints extends GridBagConstraints {
+    public static final class GridConstraints
+            extends GridBagConstraints {
 
         private static final long serialVersionUID = -6851309631667603288L;
 
@@ -191,7 +180,8 @@ public final class Utility {
             } else {
                 guiPanel = new JPanel() {
 
-                    private static final long serialVersionUID = -6087196171804412001L;
+                    private static final long serialVersionUID =
+                            -6087196171804412001L;
 
                     @Override
                     public void paint(Graphics g) {
@@ -202,14 +192,15 @@ public final class Utility {
             return guiPanel;
         }
 
-        public static final Supplier<LayoutManager> BORDER_LAYOUT_SUPPLIER = new Supplier<LayoutManager>() {
+        public static final Supplier<LayoutManager> BORDER_LAYOUT_SUPPLIER =
+                new Supplier<LayoutManager>() {
 
-            @Override
-            public LayoutManager get() {
-                return new BorderLayout();
-            }
+                    @Override
+                    public LayoutManager get() {
+                        return new BorderLayout();
+                    }
 
-        };
+                };
         public static final Color TRANSPARENT_COLOR = new Color(0, 0, 0, 0);
 
         public static Color transparentify(Color base, int percent) {
@@ -218,16 +209,9 @@ public final class Utility {
         }
 
         public static Component getComponentAtBottomOfTreeAt(Point loc) {
-            Component target = AnagarMainWindow.INSTANCE;
-            while (target instanceof Container) {
-                Component newTarget = ((Container) target).getComponentAt(loc);
-                if (newTarget == null) {
-                    break;
-                }
-                loc = SwingUtilities.convertPoint(target, loc, newTarget);
-                target = newTarget;
-            }
-            return target;
+            Container target = AnagarMainWindow.INSTANCE.internalPanel;
+            Component findComponentAt = target.findComponentAt(loc);
+            return findComponentAt;
         }
 
     }
@@ -249,12 +233,14 @@ public final class Utility {
             }
         }
 
-        public static BufferedImage asBufferedImage(Image src, Copy copySetting) {
+        public static BufferedImage
+                asBufferedImage(Image src, Copy copySetting) {
             if (copySetting == Copy.LAZY && src instanceof BufferedImage) {
                 return (BufferedImage) src;
             }
-            BufferedImage target = new BufferedImage(src.getWidth(null),
-                    src.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+            BufferedImage target =
+                    new BufferedImage(src.getWidth(null), src.getHeight(null),
+                            BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = target.createGraphics();
             g.drawImage(src, 0, 0, null);
             g.dispose();
@@ -287,6 +273,19 @@ public final class Utility {
 
             public int getRangedInt(int range, int offset) {
                 return getInstance().nextInt(range) + offset;
+            }
+
+            /**
+             * Returns {@code true} if the next random int from {@code 0->100}
+             * is less than {@code percent}.
+             * 
+             * @param percent
+             *            - The limit for returning true
+             * @return {@code true} if the next random int from {@code 0->100}
+             *         is less than {@code percent}.
+             */
+            public boolean randomPercent(int percent) {
+                return getInstance().nextInt(101) < percent;
             }
 
         }

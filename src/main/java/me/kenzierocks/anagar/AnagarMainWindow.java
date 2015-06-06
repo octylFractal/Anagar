@@ -6,8 +6,6 @@ import java.awt.AWTEventMulticaster;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -24,7 +22,8 @@ import me.kenzierocks.anagar.swing.MotionTracker;
 
 import com.google.common.base.Throwables;
 
-public class AnagarMainWindow extends SimpleWin {
+public class AnagarMainWindow
+        extends SimpleWin {
 
     public static AnagarMainWindow INSTANCE;
     private static final long serialVersionUID = 6427675907542379554L;
@@ -37,8 +36,10 @@ public class AnagarMainWindow extends SimpleWin {
         INSTANCE.requestFocusInWindow();
     }
 
-    private final AtomicReference<KeyListener> currentKeyCapture = new AtomicReference<>();
-    private final AtomicReference<MouseListener> currentMouseCapture = new AtomicReference<>();
+    private final AtomicReference<KeyListener> currentKeyCapture =
+            new AtomicReference<>();
+    private final AtomicReference<MouseListener> currentMouseCapture =
+            new AtomicReference<>();
     private final AtomicReference<State> currentState = new AtomicReference<>();
     private final MotionTracker internalMotionTracker = new MotionTracker();
 
@@ -51,7 +52,7 @@ public class AnagarMainWindow extends SimpleWin {
         addObjects();
         addBindings();
         setCurrentStateGUI(new MainState());
-       // setupGlassPane();
+        // setupGlassPane();
         pack();
         Dimension packedSize = getSize();
         setSize(Utility.Dim.requireSize(DEFAULT_SIZE, packedSize));
@@ -64,8 +65,8 @@ public class AnagarMainWindow extends SimpleWin {
 
             @Override
             public void keyReleased(KeyEvent e) {
-                KeyListener keyListener = AnagarMainWindow.this.currentKeyCapture
-                        .get();
+                KeyListener keyListener =
+                        AnagarMainWindow.this.currentKeyCapture.get();
                 if (keyListener != null) {
                     // consume it always?
                     keyListener.keyReleased(e);
@@ -75,8 +76,8 @@ public class AnagarMainWindow extends SimpleWin {
 
             @Override
             public void keyTyped(KeyEvent e) {
-                KeyListener keyListener = AnagarMainWindow.this.currentKeyCapture
-                        .get();
+                KeyListener keyListener =
+                        AnagarMainWindow.this.currentKeyCapture.get();
                 if (keyListener != null) {
                     // consume it always?
                     keyListener.keyTyped(e);
@@ -86,8 +87,8 @@ public class AnagarMainWindow extends SimpleWin {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                KeyListener keyListener = AnagarMainWindow.this.currentKeyCapture
-                        .get();
+                KeyListener keyListener =
+                        AnagarMainWindow.this.currentKeyCapture.get();
                 if (keyListener != null) {
                     // consume it always?
                     keyListener.keyPressed(e);
@@ -100,8 +101,8 @@ public class AnagarMainWindow extends SimpleWin {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                MouseListener mouseListener = AnagarMainWindow.this.currentMouseCapture
-                        .get();
+                MouseListener mouseListener =
+                        AnagarMainWindow.this.currentMouseCapture.get();
                 if (mouseListener != null) {
                     mouseListener.mouseReleased(e);
                     e.consume();
@@ -110,8 +111,8 @@ public class AnagarMainWindow extends SimpleWin {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                MouseListener mouseListener = AnagarMainWindow.this.currentMouseCapture
-                        .get();
+                MouseListener mouseListener =
+                        AnagarMainWindow.this.currentMouseCapture.get();
                 if (mouseListener != null) {
                     mouseListener.mousePressed(e);
                     e.consume();
@@ -120,8 +121,8 @@ public class AnagarMainWindow extends SimpleWin {
 
             @Override
             public void mouseExited(MouseEvent e) {
-                MouseListener mouseListener = AnagarMainWindow.this.currentMouseCapture
-                        .get();
+                MouseListener mouseListener =
+                        AnagarMainWindow.this.currentMouseCapture.get();
                 if (mouseListener != null) {
                     mouseListener.mouseExited(e);
                     e.consume();
@@ -130,8 +131,8 @@ public class AnagarMainWindow extends SimpleWin {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                MouseListener mouseListener = AnagarMainWindow.this.currentMouseCapture
-                        .get();
+                MouseListener mouseListener =
+                        AnagarMainWindow.this.currentMouseCapture.get();
                 if (mouseListener != null) {
                     mouseListener.mouseEntered(e);
                     e.consume();
@@ -140,8 +141,8 @@ public class AnagarMainWindow extends SimpleWin {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                MouseListener mouseListener = AnagarMainWindow.this.currentMouseCapture
-                        .get();
+                MouseListener mouseListener =
+                        AnagarMainWindow.this.currentMouseCapture.get();
                 if (mouseListener != null) {
                     mouseListener.mouseClicked(e);
                     e.consume();
@@ -181,20 +182,39 @@ public class AnagarMainWindow extends SimpleWin {
             dispose();
             throw Throwables.propagate(t);
         }
-        int res = JOptionPane.showConfirmDialog(this,
-                "Are you sure you want to quit " + Constants.GAME_TITLE + "?",
-                "Quit", JOptionPane.YES_NO_OPTION);
+        int res =
+                JOptionPane.showConfirmDialog(this,
+                                              "Are you sure you want to quit "
+                                                      + Constants.GAME_TITLE
+                                                      + "?",
+                                              "Quit",
+                                              JOptionPane.YES_NO_OPTION);
         if (res == JOptionPane.NO_OPTION) {
             // do nothing
         } else {
             // dispose
             dispose();
+            // make sure that the JVM exits
+            Runnable dieAfter1Second = new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ignored) {
+                    }
+                    System.exit(0);
+                }
+            };
+            Thread die = new Thread(dieAfter1Second);
+            die.setDaemon(true);
+            die.setName("ForceKillThread");
+            die.start();
         }
     }
 
     @Override
     public void actionPerformed(Object o) {
-
     }
 
     @Override
@@ -203,13 +223,13 @@ public class AnagarMainWindow extends SimpleWin {
 
     public void addTotalKeyController(KeyListener k) {
         // bah, this isn't totally concurrent
-        this.currentKeyCapture.set(AWTEventMulticaster.add(
-                this.currentKeyCapture.get(), k));
+        this.currentKeyCapture.set(AWTEventMulticaster
+                .add(this.currentKeyCapture.get(), k));
     }
 
     public void removeTotalKeyController(KeyListener k) {
-        this.currentKeyCapture.set(AWTEventMulticaster.remove(
-                this.currentKeyCapture.get(), k));
+        this.currentKeyCapture.set(AWTEventMulticaster
+                .remove(this.currentKeyCapture.get(), k));
     }
 
     public void clearTotalKeyControllers() {
@@ -218,13 +238,13 @@ public class AnagarMainWindow extends SimpleWin {
 
     public void addTotalMouseController(MouseListener k) {
         // bah, this isn't totally concurrent
-        this.currentMouseCapture.set(AWTEventMulticaster.add(
-                this.currentMouseCapture.get(), k));
+        this.currentMouseCapture.set(AWTEventMulticaster
+                .add(this.currentMouseCapture.get(), k));
     }
 
     public void removeTotalMouseController(MouseListener k) {
-        this.currentMouseCapture.set(AWTEventMulticaster.remove(
-                this.currentMouseCapture.get(), k));
+        this.currentMouseCapture.set(AWTEventMulticaster
+                .remove(this.currentMouseCapture.get(), k));
     }
 
     public void clearTotalMouseControllers() {

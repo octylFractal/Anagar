@@ -8,6 +8,8 @@ import java.awt.Component;
 import java.awt.LayoutManager;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseListener;
 
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
@@ -17,11 +19,16 @@ import me.kenzierocks.anagar.AnagarMainWindow;
 
 import com.google.common.base.Supplier;
 
-public class ActuallyLayeredPane extends JComponent {
+public class ActuallyLayeredPane
+        extends JComponent {
 
     private static final long serialVersionUID = -764793746028936642L;
 
     private static final Color TRANSPARENCY = new Color(0, 0, 0, 0);
+
+    private static final MouseListener NULL_MOUSE_LISTENER =
+            new MouseAdapter() {
+            };
 
     private final JLayeredPane internalPane = new JLayeredPane();
     private final Supplier<LayoutManager> managerSupplier;
@@ -38,7 +45,8 @@ public class ActuallyLayeredPane extends JComponent {
 
             @Override
             public void componentResized(ComponentEvent e) {
-                JLayeredPane internalPane2 = ActuallyLayeredPane.this.internalPane;
+                JLayeredPane internalPane2 =
+                        ActuallyLayeredPane.this.internalPane;
                 internalPane2.setPreferredSize(getSize());
                 internalPane2.setSize(internalPane2.getPreferredSize());
                 for (Component c : internalPane2.getComponents()) {
@@ -67,7 +75,7 @@ public class ActuallyLayeredPane extends JComponent {
         ensureLayerExists(layer);
         return (JPanel) this.internalPane.getComponentsInLayer(layer)[0];
     }
-    
+
     public boolean isLayerThere(int layer) {
         return this.internalPane.getComponentsInLayer(layer).length > 0;
     }
@@ -88,6 +96,7 @@ public class ActuallyLayeredPane extends JComponent {
             jpanel.putClientProperty(getClass(), layer);
             jpanel.setBackground(TRANSPARENCY);
             jpanel.setOpaque(false);
+            jpanel.addMouseListener(NULL_MOUSE_LISTENER);
             this.internalPane.add(jpanel, new Integer(layer));
         }
     }

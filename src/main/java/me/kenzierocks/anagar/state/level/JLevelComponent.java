@@ -17,7 +17,7 @@ public class JLevelComponent extends JComponent implements LevelGUIComponent,
     private static final long serialVersionUID = 8337487158796244819L;
 
     private final Image originalIcon;
-    private final HackGUIMetaData metaData;
+    private final HackData metaData;
 
     private Image icon;
 
@@ -26,7 +26,7 @@ public class JLevelComponent extends JComponent implements LevelGUIComponent,
      */
     private Image old;
 
-    public JLevelComponent(Image icon, HackGUIMetaData metaData) {
+    public JLevelComponent(Image icon, HackData metaData) {
         this.icon = this.originalIcon = checkNotNull(icon);
         this.metaData = checkNotNull(metaData);
         setPreferredSize(new Dimension(icon.getWidth(null),
@@ -82,7 +82,7 @@ public class JLevelComponent extends JComponent implements LevelGUIComponent,
     }
 
     @Override
-    public HackGUIMetaData getMetaData() {
+    public HackData getMetaData() {
         return this.metaData;
     }
 

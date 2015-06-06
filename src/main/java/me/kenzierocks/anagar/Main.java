@@ -6,4 +6,5 @@ public class Main {
         AnagarMainWindow window = new AnagarMainWindow();
         window.setVisible(true);
     }
+
 }

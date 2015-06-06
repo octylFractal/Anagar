@@ -19,6 +19,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import me.kenzierocks.anagar.AnagarMainWindow;
 import me.kenzierocks.anagar.Utility.GridConstraints;
@@ -37,17 +38,25 @@ public class OpenHackGUIListener implements MouseListener {
     private static final Color HOVER_COLOR = JComp
             .transparentify(Color.RED, 55);
     private static final Color SELECT_COLOR = JComp.transparentify(Color.BLUE,
-            55);
+                                                                   55);
 
-    private final Consumer<Component> SETUP_COMPONENT = new Consumer<Component>() {
+    private final Consumer<Component> SETUP_COMPONENT =
+            new Consumer<Component>() {
 
-        @Override
-        public void consume(Component c) {
-            AnagarMainWindow.INSTANCE.getMotionTracker().forComponent(c)
-                    .addMouseListener(OpenHackGUIListener.this);
-            ((JComponent) c).putClientProperty(STATE_KEY, SelectionState.OFF);
-        }
-    };
+                @Override
+                public void consume(Component c) {
+                    for (MouseListener ml : c.getMouseListeners()) {
+                        if (ml == OpenHackGUIListener.this) {
+                            return;
+                        }
+                    }
+                    AnagarMainWindow.INSTANCE.getMotionTracker()
+                            .forComponent(c)
+                            .addMouseListener(OpenHackGUIListener.this);
+                    ((JComponent) c).putClientProperty(STATE_KEY,
+                                                       SelectionState.OFF);
+                }
+            };
 
     private final LevelGUI gui;
 
@@ -69,35 +78,56 @@ public class OpenHackGUIListener implements MouseListener {
     }
 
     private void select(Point loc, JLevelComponent c, SelectionState state) {
-        SelectionState old = (SelectionState) c.getClientProperty(STATE_KEY);
-        System.err.println("SELECT " + loc + " " + old + " -> " + state);
-        c.putClientProperty(STATE_KEY, state);
-        if (old != SelectionState.OFF) {
-            Component hoverTarget = JComp.getComponentAtBottomOfTreeAt(loc);
-            System.err.println(hoverTarget);
-            if (hoverTarget != c) {
-                // ugh
+        try {
+            if (!c.contains(loc)) {
+                c.putClientProperty(STATE_KEY, SelectionState.OFF);
                 if (c.isPushed()) {
                     c.popIcon();
                 }
                 return;
             }
-            c.popIcon();
-        }
-        if (state != SelectionState.OFF) {
-            BufferedImage imag = c.getIconAsBufferedImage(true);
-            Graphics2D g = imag.createGraphics();
-            if (state == SelectionState.HOVER_ON) {
-                g.setColor(HOVER_COLOR);
-            } else if (state == SelectionState.SELECTED_ON) {
-                g.setColor(SELECT_COLOR);
+            SelectionState old =
+                    (SelectionState) c.getClientProperty(STATE_KEY);
+            c.putClientProperty(STATE_KEY, state);
+            if (old != SelectionState.OFF) {
+                Component hoverTarget =
+                        JComp.getComponentAtBottomOfTreeAt(SwingUtilities
+                                .convertPoint(c,
+                                              loc,
+                                              AnagarMainWindow.INSTANCE.internalPanel));
+                if (hoverTarget != c) {
+                    // ugh
+                    if (c.isPushed()) {
+                        c.popIcon();
+                    }
+                    return;
+                }
+                if (c.isPushed()) {
+                    c.popIcon();
+                }
             }
-            g.fillRect(0, 0, imag.getWidth(), imag.getHeight());
-            g.dispose();
-            c.pushIcon(imag);
+            if (state != SelectionState.OFF) {
+                BufferedImage imag = c.getIconAsBufferedImage(true);
+                Graphics2D g = imag.createGraphics();
+                if (state == SelectionState.HOVER_ON) {
+                    g.setColor(HOVER_COLOR);
+                } else if (state == SelectionState.SELECTED_ON) {
+                    g.setColor(SELECT_COLOR);
+                }
+                for (int x = 0; x < imag.getWidth(); x++) {
+                    for (int y = 0; y < imag.getHeight(); y++) {
+                        if ((imag.getRGB(x, y) & (0xFF << 24)) != 0) {
+                            g.drawLine(x, y, x, y);
+                        }
+                    }
+                }
+                g.dispose();
+                c.pushIcon(imag);
+            }
+        } finally {
+            // just need to repaint c
+            c.repaint();
         }
-        // just need to repaint c
-        c.repaint();
     }
 
     private void openHackGUI(JLevelComponent source) {
@@ -105,7 +135,7 @@ public class OpenHackGUIListener implements MouseListener {
         if (layer.getComponents().length > 0) {
             return;
         }
-        HackGUIMetaData data = source.getMetaData();
+        HackData data = source.getMetaData();
         JPanel panelLayer = new JPanel(new GridBagLayout());
         JPanel inbetween = new JPanel(new GridBagLayout());
         inbetween.add(panelLayer);
@@ -117,39 +147,42 @@ public class OpenHackGUIListener implements MouseListener {
         AnagarMainWindow.refreshAll();
     }
 
-    private void setupLayer(JPanel panelLayer, final HackGUIMetaData data) {
+    private void setupLayer(JPanel panelLayer, final HackData data) {
         JLabel money = new JLabel("Money: $" + data.getMoneyProvided() + "/hr");
-        JLabel power = new JLabel("Processing Power: "
-                + data.getProcessingPower() + " CPUs @ 3.40 GHz");
-        JLabel stability = new JLabel("Stability: "
-                + (100 - data.getStability())
-                + "% chance of being removed every 60 seconds");
-        JButton hackButton = JComp.actionBound(new JButton("Hack it!"),
-                new Consumer<JButton>() {
+        JLabel power =
+                new JLabel("Processing Power: " + data.getProcessingPower()
+                        + " CPUs @ 3.40 GHz");
+        JLabel stability =
+                new JLabel("Stability: " + (100 - data.getStability())
+                        + "% chance of being removed every 60 seconds");
+        JButton hackButton =
+                JComp.actionBound(new JButton("Hack it!"),
+                                  new Consumer<JButton>() {
 
-                    @Override
-                    public void consume(JButton obj) {
-                        beginHack(data);
-                    }
+                                      @Override
+                                      public void consume(JButton obj) {
+                                          beginHack(data);
+                                      }
 
-                });
-        JButton closeButton = JComp.actionBound(new JButton("Close"),
-                new Consumer<JButton>() {
+                                  });
+        JButton closeButton =
+                JComp.actionBound(new JButton("Close"),
+                                  new Consumer<JButton>() {
 
-                    @Override
-                    public void consume(JButton obj) {
-                        OpenHackGUIListener.this.gui.pane
-                                .removeLayer(LevelGUI.PANEL_LAYER);
-                        AnagarMainWindow.refreshAll();
-                    }
+                                      @Override
+                                      public void consume(JButton obj) {
+                                          OpenHackGUIListener.this.gui.pane
+                                                  .removeLayer(LevelGUI.PANEL_LAYER);
+                                          AnagarMainWindow.refreshAll();
+                                      }
 
-                });
-        GridConstraints cons = new GridConstraints()
-                .setFill(GridBagConstraints.BOTH);
+                                  });
+        GridConstraints cons =
+                new GridConstraints().setFill(GridBagConstraints.BOTH);
         cons.insets = new Insets(10, 10, 10, 10);
-        panelLayer.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(data.getTitle()),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        panelLayer.setBorder(BorderFactory.createCompoundBorder(BorderFactory
+                .createTitledBorder(data.getTitle()), BorderFactory
+                .createEmptyBorder(5, 5, 5, 5)));
         panelLayer.add(money, cons.setCoords(0, 0).copy().setWidth(2));
         panelLayer.add(power, cons.setCoords(0, 1).copy().setWidth(2));
         panelLayer.add(stability, cons.setCoords(0, 2).copy().setWidth(2));
@@ -158,8 +191,12 @@ public class OpenHackGUIListener implements MouseListener {
         panelLayer.setBackground(JComp.transparentify(Color.GREEN, 75));
     }
 
-    private void beginHack(HackGUIMetaData data) {
-
+    private void beginHack(HackData data) {
+        HackGUI gui =
+                new HackGUI(data,
+                        (LevelState) AnagarMainWindow.INSTANCE
+                                .getCurrentState(), this.gui);
+        AnagarMainWindow.INSTANCE.setCurrentStateGUI(gui);
     }
 
     @Override
@@ -169,30 +206,31 @@ public class OpenHackGUIListener implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        select(e.getPoint(), (JLevelComponent) e.getComponent(),
-                SelectionState.SELECTED_ON);
+        select(e.getPoint(),
+               (JLevelComponent) e.getComponent(),
+               SelectionState.SELECTED_ON);
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        select(e.getPoint(),
-                (JLevelComponent) e.getComponent(),
-                e.getComponent().contains(e.getPoint()) ? SelectionState.HOVER_ON
-                        : SelectionState.OFF);
-
+        select(e.getPoint(), (JLevelComponent) e.getComponent(), e
+                .getComponent().contains(e.getPoint())
+                                                      ? SelectionState.HOVER_ON
+                                                      : SelectionState.OFF);
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        select(e.getPoint(), (JLevelComponent) e.getComponent(),
-                SelectionState.HOVER_ON);
+        select(e.getPoint(),
+               (JLevelComponent) e.getComponent(),
+               SelectionState.HOVER_ON);
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-        Thread.dumpStack();
-        select(e.getPoint(), (JLevelComponent) e.getComponent(),
-                SelectionState.OFF);
+        select(e.getPoint(),
+               (JLevelComponent) e.getComponent(),
+               SelectionState.OFF);
     }
 
 }
