@@ -216,6 +216,16 @@ public final class Utility {
             return findComponentAt;
         }
 
+        public static void drawWhereItIs(BufferedImage imag, Graphics2D g) {
+            for (int x = 0; x < imag.getWidth(); x++) {
+                for (int y = 0; y < imag.getHeight(); y++) {
+                    if ((imag.getRGB(x, y) & (0xFF << 24)) != 0) {
+                        g.drawLine(x, y, x, y);
+                    }
+                }
+            }
+        }
+
     }
 
     public static final class ImageIO {

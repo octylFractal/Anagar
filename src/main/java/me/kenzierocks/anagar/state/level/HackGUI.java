@@ -157,11 +157,11 @@ public class HackGUI
 
     private void finishHacking() {
         JOptionPane.showMessageDialog(null, "Hacked!");
+        AnagarMainWindow.INSTANCE.setCurrentGUI(this.returnToG);
+        AnagarMainWindow.INSTANCE.setCurrentState(this.returnToS);
         Player p = Player.THE_PLAYER;
         p.captureData(this.data);
         this.returnToG.updatePlayerTracker();
-        AnagarMainWindow.INSTANCE.setCurrentGUI(this.returnToG);
-        AnagarMainWindow.INSTANCE.setCurrentState(this.returnToS);
     }
 
     @Override

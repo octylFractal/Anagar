@@ -1,5 +1,6 @@
 package me.kenzierocks.anagar.state.level;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -11,7 +12,6 @@ import javax.swing.Timer;
 
 import me.kenzierocks.anagar.AnagarMainWindow;
 import me.kenzierocks.anagar.Utility.Numbers.ExtendedRandom;
-import me.kenzierocks.anagar.state.State;
 
 public final class Player implements ActionListener {
 
@@ -21,11 +21,11 @@ public final class Player implements ActionListener {
     private static final ExtendedRandom RANDOM = ExtendedRandom
             .wrap(new Random());
     static {
-        Timer.setLogTimers(true);
         moneyGiver.start();
     }
     public static final Player THE_PLAYER = new Player();
     private final List<HackData> capturedData = new ArrayList<>();
+    private int recaptureCounter = 0;
     private int moneyPerSecond;
     private int processingPower;
     private int money;
@@ -38,7 +38,10 @@ public final class Player implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         increaseMoney();
-        attemptRecapture();
+        if (this.recaptureCounter % 60 == 0) {
+            attemptRecapture();
+        }
+        this.recaptureCounter++;
     }
 
     private void attemptRecapture() {
@@ -47,15 +50,20 @@ public final class Player implements ActionListener {
         }
         HackData recapture = RANDOM.getRandomItem(this.capturedData);
         if (!RANDOM.randomPercent(recapture.getStability())) {
+            Component c =
+                    AnagarMainWindow.INSTANCE.internalPanel.getComponent(0);
+            if (c instanceof LevelGUI) {
+                ((LevelGUI) c).getComponentWithData(recapture).setHacked(false);
+            }
             releaseData(recapture);
         }
     }
 
     public void increaseMoney() {
         this.money += this.moneyPerSecond;
-        State currentState = AnagarMainWindow.INSTANCE.getCurrentState();
-        if (currentState instanceof LevelGUI) {
-            ((LevelGUI) currentState).updatePlayerTracker();
+        Component gui = AnagarMainWindow.INSTANCE.internalPanel.getComponent(0);
+        if (gui instanceof LevelGUI) {
+            ((LevelGUI) gui).updatePlayerTracker();
         }
     }
 
@@ -95,6 +103,10 @@ public final class Player implements ActionListener {
         increaseMoneyPerSecond(data.getMoneyProvided());
         increaseProcessingPower(data.getProcessingPower());
         this.capturedData.add(data);
+        Component c = AnagarMainWindow.INSTANCE.internalPanel.getComponent(0);
+        if (c instanceof LevelGUI) {
+            ((LevelGUI) c).getComponentWithData(data).setHacked(true);
+        }
     }
 
     public void releaseData(HackData data) {
@@ -103,6 +115,14 @@ public final class Player implements ActionListener {
         }
         increaseMoneyPerSecond(-data.getMoneyProvided());
         increaseProcessingPower(-data.getProcessingPower());
+    }
+    
+    public void reset() {
+        this.capturedData.clear();
+        this.recaptureCounter = 0;
+        this.moneyPerSecond = 0;
+        this.processingPower = 0;
+        this.money = 0;
     }
 
 }

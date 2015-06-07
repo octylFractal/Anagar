@@ -6,7 +6,6 @@ import me.kenzierocks.anagar.AnagarMainWindow;
 import me.kenzierocks.anagar.state.PauseScreen;
 import me.kenzierocks.anagar.state.State;
 import me.kenzierocks.anagar.state.StateType;
-import me.kenzierocks.anagar.state.StateType.Defaults;
 
 public class LevelState implements State {
 
@@ -16,8 +15,9 @@ public class LevelState implements State {
 
     public LevelState(int levelNum) {
         this.levelNum = levelNum;
-        this.type = StateType.Defaults.LEVEL.createStateType(Integer.toString(
-                levelNum, 36));
+        this.type =
+                StateType.Defaults.LEVEL.createStateType(Integer
+                        .toString(levelNum, 36));
     }
 
     public int getLevelNum() {
@@ -40,7 +40,8 @@ public class LevelState implements State {
     @Override
     public void onKeyRelease(KeyEvent event) {
         if (event.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            AnagarMainWindow.INSTANCE.setCurrentStateGUI(new PauseScreen(this, this.currentGUI));
+            AnagarMainWindow.INSTANCE.setCurrentStateGUI(new PauseScreen(this,
+                    this.currentGUI));
         }
     }
 

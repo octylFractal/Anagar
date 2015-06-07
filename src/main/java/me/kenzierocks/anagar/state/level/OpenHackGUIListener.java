@@ -114,13 +114,7 @@ public class OpenHackGUIListener implements MouseListener {
                 } else if (state == SelectionState.SELECTED_ON) {
                     g.setColor(SELECT_COLOR);
                 }
-                for (int x = 0; x < imag.getWidth(); x++) {
-                    for (int y = 0; y < imag.getHeight(); y++) {
-                        if ((imag.getRGB(x, y) & (0xFF << 24)) != 0) {
-                            g.drawLine(x, y, x, y);
-                        }
-                    }
-                }
+                JComp.drawWhereItIs(imag, g);
                 g.dispose();
                 c.pushIcon(imag);
             }
@@ -171,10 +165,7 @@ public class OpenHackGUIListener implements MouseListener {
 
                                       @Override
                                       public void consume(JButton obj) {
-                                          OpenHackGUIListener.this.gui.pane
-                                                  .removeLayer(Layer.PANEL
-                                                          .ordinal());
-                                          AnagarMainWindow.refreshAll();
+                                          closeHackWindow();
                                       }
 
                                   });
@@ -193,6 +184,7 @@ public class OpenHackGUIListener implements MouseListener {
     }
 
     private void beginHack(HackData data) {
+        closeHackWindow();
         HackGUI gui =
                 new HackGUI(data,
                         (LevelState) AnagarMainWindow.INSTANCE
@@ -232,6 +224,11 @@ public class OpenHackGUIListener implements MouseListener {
         select(e.getPoint(),
                (JLevelComponent) e.getComponent(),
                SelectionState.OFF);
+    }
+
+    private void closeHackWindow() {
+        OpenHackGUIListener.this.gui.pane.removeLayer(Layer.PANEL.ordinal());
+        AnagarMainWindow.refreshAll();
     }
 
 }
