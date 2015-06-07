@@ -305,7 +305,7 @@ public final class Utility {
              *         is less than {@code percent}.
              */
             public boolean randomPercent(int percent) {
-                return getInstance().nextInt(101) < percent;
+                return getInstance().nextInt(100) < percent;
             }
 
         }

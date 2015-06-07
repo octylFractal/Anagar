@@ -194,6 +194,11 @@ public class OpenHackGUIListener implements MouseListener {
         AnagarMainWindow.INSTANCE.setCurrentStateGUI(gui);
     }
 
+    private void closeHackWindow() {
+        OpenHackGUIListener.this.gui.pane.removeLayer(Layer.PANEL.ordinal());
+        AnagarMainWindow.refreshAll();
+    }
+
     @Override
     public void mouseClicked(MouseEvent e) {
         openHackGUI((JLevelComponent) e.getComponent());
@@ -226,11 +231,6 @@ public class OpenHackGUIListener implements MouseListener {
         select(e.getPoint(),
                (JLevelComponent) e.getComponent(),
                SelectionState.OFF);
-    }
-
-    private void closeHackWindow() {
-        OpenHackGUIListener.this.gui.pane.removeLayer(Layer.PANEL.ordinal());
-        AnagarMainWindow.refreshAll();
     }
 
 }

@@ -4,12 +4,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.awt.AWTEventMulticaster;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -32,6 +30,7 @@ public class AnagarMainWindow
     public static void refreshAll() {
         INSTANCE.validate();
         INSTANCE.repaint();
+        INSTANCE.requestFocusInWindow();
     }
 
     private final AtomicReference<KeyListener> currentKeyCapture =
@@ -54,100 +53,6 @@ public class AnagarMainWindow
         setMinimumSize(DEFAULT_SIZE);
         pack();
         drop();
-    }
-
-    private void setupGlassPane() {
-        Component c = getGlassPane();
-        c.addKeyListener(new KeyListener() {
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                KeyListener keyListener =
-                        AnagarMainWindow.this.currentKeyCapture.get();
-                if (keyListener != null) {
-                    // consume it always?
-                    keyListener.keyReleased(e);
-                    e.consume();
-                }
-            }
-
-            @Override
-            public void keyTyped(KeyEvent e) {
-                KeyListener keyListener =
-                        AnagarMainWindow.this.currentKeyCapture.get();
-                if (keyListener != null) {
-                    // consume it always?
-                    keyListener.keyTyped(e);
-                    e.consume();
-                }
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                KeyListener keyListener =
-                        AnagarMainWindow.this.currentKeyCapture.get();
-                if (keyListener != null) {
-                    // consume it always?
-                    keyListener.keyPressed(e);
-                    e.consume();
-                }
-            }
-
-        });
-        c.addMouseListener(new MouseListener() {
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                MouseListener mouseListener =
-                        AnagarMainWindow.this.currentMouseCapture.get();
-                if (mouseListener != null) {
-                    mouseListener.mouseReleased(e);
-                    e.consume();
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                MouseListener mouseListener =
-                        AnagarMainWindow.this.currentMouseCapture.get();
-                if (mouseListener != null) {
-                    mouseListener.mousePressed(e);
-                    e.consume();
-                }
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                MouseListener mouseListener =
-                        AnagarMainWindow.this.currentMouseCapture.get();
-                if (mouseListener != null) {
-                    mouseListener.mouseExited(e);
-                    e.consume();
-                }
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                MouseListener mouseListener =
-                        AnagarMainWindow.this.currentMouseCapture.get();
-                if (mouseListener != null) {
-                    mouseListener.mouseEntered(e);
-                    e.consume();
-                }
-            }
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                MouseListener mouseListener =
-                        AnagarMainWindow.this.currentMouseCapture.get();
-                if (mouseListener != null) {
-                    mouseListener.mouseClicked(e);
-                    e.consume();
-                }
-            }
-
-        });
-        c.addMouseMotionListener(this.internalMotionTracker);
     }
 
     @Override

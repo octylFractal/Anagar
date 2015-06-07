@@ -321,7 +321,7 @@ public class LevelGUI
                 double xTo = toRect.getCenterX();
                 double yTo = toRect.getCenterY();
                 if (lines.size() <= NICE_LINE_LOOK_REQUIRED_MAX
-                        || this.random.getInstance().nextInt(100) > 70) {
+                        || this.random.randomPercent(100)) {
                     lines.add(new int[] { (int) xFrom, (int) yFrom, (int) xTo,
                             (int) yTo });
                 }
