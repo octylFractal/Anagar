@@ -32,8 +32,6 @@ public class AnagarMainWindow
     public static void refreshAll() {
         INSTANCE.validate();
         INSTANCE.repaint();
-        INSTANCE.requestFocus();
-        INSTANCE.requestFocusInWindow();
     }
 
     private final AtomicReference<KeyListener> currentKeyCapture =

@@ -135,14 +135,15 @@ public class OpenHackGUIListener implements MouseListener {
         inbetween.add(panelLayer);
         layer.add(inbetween);
         inbetween.setOpaque(false);
-        setupLayer(panelLayer, data);
+        setupLayer(source, panelLayer, data);
         this.gui.pane.dispatchEvent(new ComponentEvent(this.gui.pane,
                 ComponentEvent.COMPONENT_RESIZED));
         AnagarMainWindow.refreshAll();
     }
 
-    private void setupLayer(JPanel panelLayer, final HackData data) {
-        JLabel money = new JLabel("Money: $" + data.getMoneyProvided() + "/hr");
+    private void setupLayer(JLevelComponent src, JPanel panelLayer,
+            final HackData data) {
+        JLabel money = new JLabel("Money: $" + data.getMoneyProvided() + "/s");
         JLabel power =
                 new JLabel("Processing Power: " + data.getProcessingPower()
                         + " CPUs @ 3.40 GHz");
@@ -159,6 +160,7 @@ public class OpenHackGUIListener implements MouseListener {
                                       }
 
                                   });
+        hackButton.setEnabled(!src.isHacked());
         JButton closeButton =
                 JComp.actionBound(new JButton("Close"),
                                   new Consumer<JButton>() {
@@ -180,7 +182,7 @@ public class OpenHackGUIListener implements MouseListener {
         panelLayer.add(stability, cons.setCoords(0, 2).copy().setWidth(2));
         panelLayer.add(hackButton, cons.setCoords(0, 3));
         panelLayer.add(closeButton, cons.setCoords(2, 3));
-        panelLayer.setBackground(JComp.transparentify(Color.GREEN, 75));
+        panelLayer.setBackground(JComp.transparentify(Color.GREEN, 90));
     }
 
     private void beginHack(HackData data) {

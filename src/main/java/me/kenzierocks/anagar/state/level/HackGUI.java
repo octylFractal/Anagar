@@ -150,12 +150,16 @@ public class HackGUI
         }
         this.keypresses++;
         this.bar.setValue(this.keypresses);
-        if (this.keypresses > this.kpRequired) {
+        if (this.keypresses >= this.kpRequired) {
             finishHacking();
         }
     }
 
     private void finishHacking() {
+        if(Boolean.TRUE.equals(getClientProperty(JLevelComponent.HACKED_KEY))){
+            return;
+        }
+        putClientProperty(JLevelComponent.HACKED_KEY, Boolean.TRUE);
         JOptionPane.showMessageDialog(null, "Hacked!");
         AnagarMainWindow.INSTANCE.setCurrentGUI(this.returnToG);
         AnagarMainWindow.INSTANCE.setCurrentState(this.returnToS);
