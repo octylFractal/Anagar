@@ -28,7 +28,8 @@ import me.kenzierocks.anagar.state.level.LevelGUI;
 import me.kenzierocks.anagar.state.level.LevelState;
 import me.kenzierocks.anagar.swing.HintTextField;
 
-public class MainState extends JPanelBasedGUI implements State {
+public class MainState
+        extends JPanelBasedGUI implements State {
 
     private static final long serialVersionUID = -417283140788552174L;
 
@@ -36,7 +37,7 @@ public class MainState extends JPanelBasedGUI implements State {
         setLayout(new GridBagLayout());
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout(10, 10));
-        JLabel titleLabel = new JLabel("Anagar ");
+        JLabel titleLabel = new JLabel("Anagar", JLabel.CENTER);
         titleLabel.setFont(Font.decode("Vani-bold-36"));
         panel.add(titleLabel, BorderLayout.CENTER);
         JPanel buttons = makeButtonsPanel();
@@ -48,18 +49,20 @@ public class MainState extends JPanelBasedGUI implements State {
     private JPanel makeButtonsPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         int col = 0;
-        GridConstraints cons = new GridConstraints()
-                .setAnchor(GridBagConstraints.CENTER);
+        GridConstraints cons =
+                new GridConstraints().setAnchor(GridBagConstraints.CENTER);
         panel.add(JComp.actionBound(new JButton("Start"),
-                new Consumer<JButton>() {
+                                    new Consumer<JButton>() {
 
-                    @Override
-                    public void consume(JButton obj) {
-                        changeToLevel(0);
-                    }
+                                        @Override
+                                        public void consume(JButton obj) {
+                                            changeToLevel(0);
+                                        }
 
-                }), cons.copy().setFill(GridBagConstraints.HORIZONTAL)
-                .setWidth(GridBagConstraints.REMAINDER).setCoords(0, col++));
+                                    }),
+                  cons.copy().setFill(GridBagConstraints.HORIZONTAL)
+                          .setWidth(GridBagConstraints.REMAINDER)
+                          .setCoords(0, col++));
 
         panel.add(Box.createVerticalStrut(10), cons.copy().setWidth(3)
                 .setCoords(0, col++));
@@ -71,7 +74,7 @@ public class MainState extends JPanelBasedGUI implements State {
             public void consume(JButton obj) {
                 try {
                     changeToLevel(Integer.parseInt(text.getText().replace(",",
-                            "")));
+                                                                          "")));
                 } catch (NumberFormatException notANumber) {
                     // ignore
                 }
@@ -92,27 +95,27 @@ public class MainState extends JPanelBasedGUI implements State {
         });
         panel.add(text, cons.copy().setFill(GridBagConstraints.HORIZONTAL)
                 .setWidth(GridBagConstraints.RELATIVE).setCoords(0, col));
-        panel.add(
-                JComp.actionBound(new JButton("Start Level"), startLevelAction),
-                cons.copy().setFill(GridBagConstraints.HORIZONTAL)
-                        .setWidth(GridBagConstraints.REMAINDER)
-                        .setCoords(2, col));
+        panel.add(JComp.actionBound(new JButton("Start Level"),
+                                    startLevelAction),
+                  cons.copy().setFill(GridBagConstraints.HORIZONTAL)
+                          .setWidth(GridBagConstraints.REMAINDER)
+                          .setCoords(2, col));
         col++;
 
         panel.add(Box.createVerticalStrut(10), cons.setCoords(1, col++));
 
-        panel.add(
-                JComp.actionBound(new JButton("Exit"), new Consumer<JButton>() {
+        panel.add(JComp.actionBound(new JButton("Exit"),
+                                    new Consumer<JButton>() {
 
-                    @Override
-                    public void consume(JButton obj) {
-                        AnagarMainWindow.INSTANCE.close();
-                    }
+                                        @Override
+                                        public void consume(JButton obj) {
+                                            AnagarMainWindow.INSTANCE.close();
+                                        }
 
-                }),
-                cons.copy().setFill(GridBagConstraints.HORIZONTAL)
-                        .setWidth(GridBagConstraints.REMAINDER)
-                        .setCoords(0, col++));
+                                    }),
+                  cons.copy().setFill(GridBagConstraints.HORIZONTAL)
+                          .setWidth(GridBagConstraints.REMAINDER)
+                          .setCoords(0, col++));
         return panel;
     }
 
@@ -122,11 +125,17 @@ public class MainState extends JPanelBasedGUI implements State {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                String font = (String) JOptionPane.showInputDialog(
-                        AnagarMainWindow.INSTANCE, "Choose a font",
-                        "Font Chooser", JOptionPane.QUESTION_MESSAGE, null,
-                        GraphicsEnvironment.getLocalGraphicsEnvironment()
-                                .getAvailableFontFamilyNames(), null);
+                String font =
+                        (String) JOptionPane
+                                .showInputDialog(AnagarMainWindow.INSTANCE,
+                                                 "Choose a font",
+                                                 "Font Chooser",
+                                                 JOptionPane.QUESTION_MESSAGE,
+                                                 null,
+                                                 GraphicsEnvironment
+                                                         .getLocalGraphicsEnvironment()
+                                                         .getAvailableFontFamilyNames(),
+                                                 null);
                 if (font != null) {
                     titleLabel.setFont(Font.decode(font + "-bold-36"));
                 }

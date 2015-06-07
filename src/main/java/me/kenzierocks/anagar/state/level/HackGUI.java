@@ -30,20 +30,24 @@ public class HackGUI
 
     private static final long serialVersionUID = 3727410376874340909L;
 
-    private static final Font drawFont = Font.decode("Courier New-14");
+    private static final Font DRAW_FONT = Font.decode("Courier New-14");
     private static final Joiner NEWLINE = Joiner.on('\n');
+    private static final Timer TIMER = new Timer(20, null);
+    static {
+        TIMER.start();
+    }
 
     private static String formatString(int value, int max) {
         return String.format("%s/%s", value, max);
     }
 
     private static int calculateHeight(Graphics g) {
-        FontMetrics fm = g.getFontMetrics(drawFont);
+        FontMetrics fm = g.getFontMetrics(DRAW_FONT);
         return AnagarMainWindow.INSTANCE.getHeight() / fm.getHeight();
     }
 
     private static int calculateWidth(Graphics g) {
-        FontMetrics fm = g.getFontMetrics(drawFont);
+        FontMetrics fm = g.getFontMetrics(DRAW_FONT);
         return AnagarMainWindow.INSTANCE.getWidth() / fm.charWidth('A');
     }
 
@@ -62,8 +66,8 @@ public class HackGUI
         this.returnToG = gui;
         this.data = data;
         this.kpRequired =
-                (state.getLevelNum() + 2) * 2 * data.getMoneyProvided()
-                        * data.getProcessingPower();
+                (state.getLevelNum() + data.getMoneyProvided() + data
+                        .getProcessingPower()) * 2;
         this.bar = new JProgressBar(0, this.kpRequired);
         this.bar.addChangeListener(new ChangeListener() {
 
@@ -82,7 +86,7 @@ public class HackGUI
         add(this.bar);
         this.tracker = null;
         setBackground(Color.BLACK);
-        Timer timer = new Timer(20, new ActionListener() {
+        TIMER.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -90,7 +94,6 @@ public class HackGUI
             }
 
         });
-        timer.start();
         AnagarMainWindow.INSTANCE.addComponentListener(new ComponentAdapter() {
 
             @Override
@@ -117,7 +120,7 @@ public class HackGUI
             HackGUI.this.tracker = HackGUI.this.tracker.advance();
         }
         g.setColor(Color.GREEN);
-        g.setFont(drawFont);
+        g.setFont(DRAW_FONT);
         String toDraw = NEWLINE.join(this.tracker.getGrid());
         int y = 0;
         for (String line : toDraw.split("\n")) {
