@@ -3,7 +3,10 @@ package me.kenzierocks.anagar.state.level;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
@@ -15,7 +18,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.border.Border;
 
 import me.kenzierocks.anagar.AnagarMainWindow;
 import me.kenzierocks.anagar.Utility;
@@ -23,13 +31,15 @@ import me.kenzierocks.anagar.Utility.GridConstraints;
 import me.kenzierocks.anagar.Utility.ImageIO;
 import me.kenzierocks.anagar.Utility.ImageIO.Copy;
 import me.kenzierocks.anagar.Utility.JComp;
+import me.kenzierocks.anagar.Utility.Numbers;
 import me.kenzierocks.anagar.Utility.Numbers.ExtendedRandom;
 import me.kenzierocks.anagar.Utility.RectangleRecycler;
 import me.kenzierocks.anagar.state.JPanelBasedGUI;
 import me.kenzierocks.anagar.swing.ActuallyLayeredPane;
 import autovalue.shaded.com.google.common.common.collect.ImmutableList;
 
-public class LevelGUI extends JPanelBasedGUI {
+public class LevelGUI
+        extends JPanelBasedGUI {
 
     private static final long serialVersionUID = -850649718212152509L;
 
@@ -40,9 +50,8 @@ public class LevelGUI extends JPanelBasedGUI {
     private static final int LIKELY_FILLED = 100;
     private static final int NICE_LINE_LOOK_REQUIRED_MAX = 3;
     private static final int ASSUMED_GRID_SIZE = 10;
-    public static final int LINE_LAYER = 99;
-    public static final int TARGETS_LAYER = LINE_LAYER + 1;
-    public static final int PANEL_LAYER = TARGETS_LAYER + 1;
+
+    private static final Font LEVEL_TITLE_FONT = Font.decode("Courier New-16");
 
     private static int calculateWidth() {
         Insets i = AnagarMainWindow.INSTANCE.getInsets();
@@ -69,11 +78,48 @@ public class LevelGUI extends JPanelBasedGUI {
 
     public LevelGUI(int levelNum) {
         this.levelNum = levelNum;
-        this.random = ExtendedRandom.wrap(new Random(serialVersionUID
-                / (this.levelNum + 1)));
+        this.random =
+                ExtendedRandom.wrap(new Random(serialVersionUID
+                        / (this.levelNum + 1)));
         setLayout(new BorderLayout());
         add(this.pane);
         generateLevel();
+        updatePlayerTracker();
+    }
+
+    public void updatePlayerTracker() {
+        this.pane.removeLayer(Layer.TRACKER.ordinal());
+        JPanel gui = new JPanel();
+        JPanel layer = this.pane.getLayer(Layer.TRACKER.ordinal());
+        layer.setLayout(new FlowLayout(FlowLayout.LEFT));
+        layer.add(gui);
+        gui.setLayout(new GridBagLayout());
+        gui.setBackground(Color.GREEN);
+        Border cyanLine = BorderFactory.createLineBorder(Color.CYAN, 3, true);
+        Border whiteLine = BorderFactory.createLineBorder(Color.WHITE);
+        Border merge1 = BorderFactory.createCompoundBorder(cyanLine, whiteLine);
+        Border merge2 = BorderFactory.createCompoundBorder(whiteLine, merge1);
+        gui.setBorder(merge2);
+        Player p = Player.THE_PLAYER;
+        GridConstraints cons =
+                new GridConstraints().setFill(GridBagConstraints.BOTH);
+        cons.insets = new Insets(0, 5, 0, 5);
+        JLabel titleLabel =
+                new JLabel("Level " + Numbers.prettify(this.levelNum),
+                        JLabel.CENTER);
+        titleLabel.setFont(LEVEL_TITLE_FONT);
+        gui.add(Box.createVerticalStrut(5), cons.setCoords(0, 0));
+        gui.add(titleLabel, cons.setCoords(0, 1));
+        gui.add(new JSeparator(), cons.setCoords(0, 2));
+        gui.add(new JLabel("Money: $" + Numbers.prettify(p.getMoney())),
+                cons.setCoords(0, 3));
+        gui.add(new JLabel("MPS: $" + Numbers.prettify(p.getMoneyPerSecond())
+                + "/s"), cons.setCoords(0, 4));
+        gui.add(new JLabel("Processing Power: "
+                        + Numbers.prettify(p.getProcessingPower())),
+                cons.setCoords(0, 5));
+        gui.add(Box.createVerticalStrut(5), cons.setCoords(0, 6));
+        AnagarMainWindow.refreshAll();
     }
 
     private LevelHackObject getRandomData() {
@@ -83,16 +129,16 @@ public class LevelGUI extends JPanelBasedGUI {
     private void generateLevel() {
         int count = calculateLevelEnemyCount(this.levelNum);
         int attempts = 0;
-        JPanel panel = this.pane.getLayer(TARGETS_LAYER);
+        JPanel panel = this.pane.getLayer(Layer.TARGETS.ordinal());
         panel.setLayout(null);
         mainloop: for (int i = 0; i < count; i++) {
             LevelHackObject hackObject = getRandomData();
-            BufferedImage image = ImageIO.asBufferedImage(
-                    hackObject.getImage(), Copy.LAZY);
+            BufferedImage image =
+                    ImageIO.asBufferedImage(hackObject.getImage(), Copy.LAZY);
             int x = this.random.getRangedInt(calculateWidth(), OFFSET);
             int y = this.random.getRangedInt(calculateHeight(), OFFSET);
-            Rectangle bounds = new Rectangle(x, y, image.getHeight(),
-                    image.getWidth());
+            Rectangle bounds =
+                    new Rectangle(x, y, image.getHeight(), image.getWidth());
             for (Component z : panel.getComponents()) {
                 if (z.getBounds().intersects(bounds)) {
                     i--;
@@ -105,8 +151,8 @@ public class LevelGUI extends JPanelBasedGUI {
                 }
             }
             attempts = 0;
-            Component comp = new JLevelComponent(image, hackObject
-                    .getMetaData().get());
+            Component comp =
+                    new JLevelComponent(image, hackObject.getMetaData().get());
             comp.addMouseListener(this.openHackGUI);
             comp.setLocation(x, y);
             panel.add(comp);
@@ -133,10 +179,10 @@ public class LevelGUI extends JPanelBasedGUI {
         int y = 0;
         for (int i = 0; i < count; i++) {
             LevelHackObject hackObject = getRandomData();
-            BufferedImage image = ImageIO.asBufferedImage(
-                    hackObject.getImage(), Copy.LAZY);
-            Component comp = new JLevelComponent(image, hackObject
-                    .getMetaData().get());
+            BufferedImage image =
+                    ImageIO.asBufferedImage(hackObject.getImage(), Copy.LAZY);
+            Component comp =
+                    new JLevelComponent(image, hackObject.getMetaData().get());
             panel.add(comp, cons.setCoords(x, y));
             x++;
             if (x > ASSUMED_GRID_SIZE) {
@@ -150,12 +196,13 @@ public class LevelGUI extends JPanelBasedGUI {
     }
 
     private void addLines() {
-        JPanel panel = this.pane.getLayer(LINE_LAYER);
+        JPanel panel = this.pane.getLayer(Layer.LINE.ordinal());
         panel.removeAll();
         Rectangle fromRect = RectangleRecycler.fetch();
         Rectangle toRect = RectangleRecycler.fetch();
-        List<Component> toConnect = ImmutableList.copyOf(this.pane.getLayer(
-                TARGETS_LAYER).getComponents());
+        List<Component> toConnect =
+                ImmutableList.copyOf(this.pane
+                        .getLayer(Layer.TARGETS.ordinal()).getComponents());
         int compCount = toConnect.size();
         final List<int[]> lines = new ArrayList<>(compCount * compCount);
         for (int i = 0; i < compCount; i++) {
@@ -175,7 +222,8 @@ public class LevelGUI extends JPanelBasedGUI {
                 }
             }
         }
-        class LinePanel extends JPanel {
+        class LinePanel
+                extends JPanel {
 
             private static final long serialVersionUID = 4753074418055771306L;
 
@@ -189,17 +237,25 @@ public class LevelGUI extends JPanelBasedGUI {
             public void paint(Graphics g) {
                 for (int[] line : lines) {
                     g.setColor(Color.WHITE);
-                    g.drawLine(line[0] + 2, line[1] + 2, line[2] + 2,
-                            line[3] + 2);
+                    g.drawLine(line[0] + 2,
+                               line[1] + 2,
+                               line[2] + 2,
+                               line[3] + 2);
                     g.setColor(NICE_SHADE_OF_BLUE);
-                    g.drawLine(line[0] + 1, line[1] + 1, line[2] + 1,
-                            line[3] + 1);
+                    g.drawLine(line[0] + 1,
+                               line[1] + 1,
+                               line[2] + 1,
+                               line[3] + 1);
                     g.drawLine(line[0], line[1], line[2], line[3]);
-                    g.drawLine(line[0] - 1, line[1] - 1, line[2] - 1,
-                            line[3] - 1);
+                    g.drawLine(line[0] - 1,
+                               line[1] - 1,
+                               line[2] - 1,
+                               line[3] - 1);
                     g.setColor(Color.WHITE);
-                    g.drawLine(line[0] - 2, line[1] - 2, line[2] - 2,
-                            line[3] - 2);
+                    g.drawLine(line[0] - 2,
+                               line[1] - 2,
+                               line[2] - 2,
+                               line[3] - 2);
                 }
             }
 

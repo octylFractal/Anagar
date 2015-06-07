@@ -19,6 +19,7 @@ import javax.swing.event.ChangeListener;
 
 import me.kenzierocks.anagar.AnagarMainWindow;
 import me.kenzierocks.anagar.state.JPanelBasedGUI;
+import me.kenzierocks.anagar.state.PauseScreen;
 import me.kenzierocks.anagar.state.State;
 import me.kenzierocks.anagar.state.StateType;
 
@@ -136,6 +137,10 @@ public class HackGUI
 
     @Override
     public void onKeyRelease(KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            AnagarMainWindow.INSTANCE.setCurrentStateGUI(new PauseScreen(this));
+            return;
+        }
         if (this.keypresses > this.kpRequired) {
             // !!!!
             return;
@@ -151,6 +156,7 @@ public class HackGUI
         JOptionPane.showMessageDialog(null, "Hacked!");
         Player p = Player.THE_PLAYER;
         p.captureData(this.data);
+        this.returnToG.updatePlayerTracker();
         AnagarMainWindow.INSTANCE.setCurrentGUI(this.returnToG);
         AnagarMainWindow.INSTANCE.setCurrentState(this.returnToS);
     }

@@ -1,5 +1,7 @@
 package me.kenzierocks.anagar;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -264,14 +266,22 @@ public final class Utility {
             public abstract Random getInstance();
 
             public <T> T getRandomItem(List<? extends T> coll) {
+                checkState(!coll.isEmpty(),
+                           "Cannot get a random item from an empty collection");
                 return coll.get(getInstance().nextInt(coll.size()));
             }
 
             public <T> T getRandomItem(T[] arr) {
+                checkState(arr.length > 0,
+                           "Cannot get a random item from an empty array");
                 return arr[getInstance().nextInt(arr.length)];
             }
 
             public int getRangedInt(int range, int offset) {
+                if (range <= 0) {
+                    offset += range - 1;
+                    range = 1;
+                }
                 return getInstance().nextInt(range) + offset;
             }
 

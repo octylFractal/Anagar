@@ -53,9 +53,8 @@ public class AnagarMainWindow
         addBindings();
         setCurrentStateGUI(new MainState());
         // setupGlassPane();
+        setMinimumSize(DEFAULT_SIZE);
         pack();
-        Dimension packedSize = getSize();
-        setSize(Utility.Dim.requireSize(DEFAULT_SIZE, packedSize));
         drop();
     }
 

@@ -9,7 +9,9 @@ import java.util.Random;
 
 import javax.swing.Timer;
 
+import me.kenzierocks.anagar.AnagarMainWindow;
 import me.kenzierocks.anagar.Utility.Numbers.ExtendedRandom;
+import me.kenzierocks.anagar.state.State;
 
 public final class Player implements ActionListener {
 
@@ -19,6 +21,7 @@ public final class Player implements ActionListener {
     private static final ExtendedRandom RANDOM = ExtendedRandom
             .wrap(new Random());
     static {
+        Timer.setLogTimers(true);
         moneyGiver.start();
     }
     public static final Player THE_PLAYER = new Player();
@@ -39,6 +42,9 @@ public final class Player implements ActionListener {
     }
 
     private void attemptRecapture() {
+        if (this.capturedData.isEmpty()) {
+            return;
+        }
         HackData recapture = RANDOM.getRandomItem(this.capturedData);
         if (!RANDOM.randomPercent(recapture.getStability())) {
             releaseData(recapture);
@@ -47,6 +53,10 @@ public final class Player implements ActionListener {
 
     public void increaseMoney() {
         this.money += this.moneyPerSecond;
+        State currentState = AnagarMainWindow.INSTANCE.getCurrentState();
+        if (currentState instanceof LevelGUI) {
+            ((LevelGUI) currentState).updatePlayerTracker();
+        }
     }
 
     public int getMoneyPerSecond() {

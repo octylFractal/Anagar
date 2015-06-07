@@ -62,7 +62,7 @@ public class OpenHackGUIListener implements MouseListener {
 
     public OpenHackGUIListener(LevelGUI levelGUI) {
         this.gui = levelGUI;
-        JPanel layer = levelGUI.pane.getLayer(LevelGUI.TARGETS_LAYER);
+        JPanel layer = levelGUI.pane.getLayer(Layer.TARGETS.ordinal());
         for (Component c : layer.getComponents()) {
             this.SETUP_COMPONENT.consume(c);
         }
@@ -131,7 +131,7 @@ public class OpenHackGUIListener implements MouseListener {
     }
 
     private void openHackGUI(JLevelComponent source) {
-        JPanel layer = this.gui.pane.getLayer(LevelGUI.PANEL_LAYER);
+        JPanel layer = this.gui.pane.getLayer(Layer.PANEL.ordinal());
         if (layer.getComponents().length > 0) {
             return;
         }
@@ -172,7 +172,8 @@ public class OpenHackGUIListener implements MouseListener {
                                       @Override
                                       public void consume(JButton obj) {
                                           OpenHackGUIListener.this.gui.pane
-                                                  .removeLayer(LevelGUI.PANEL_LAYER);
+                                                  .removeLayer(Layer.PANEL
+                                                          .ordinal());
                                           AnagarMainWindow.refreshAll();
                                       }
 
