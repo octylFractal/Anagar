@@ -21,6 +21,7 @@ import javax.swing.Timer;
 import javax.swing.border.Border;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
 
 import me.kenzierocks.anagar.AnagarMainWindow;
 import me.kenzierocks.anagar.Utility;
@@ -34,7 +35,6 @@ import me.kenzierocks.anagar.Utility.RectangleRecycler;
 import me.kenzierocks.anagar.state.JPanelBasedGUI;
 import me.kenzierocks.anagar.state.State;
 import me.kenzierocks.anagar.swing.ActuallyLayeredPane;
-import autovalue.shaded.com.google.common.common.collect.ImmutableList;
 
 public class LevelGUI
         extends JPanelBasedGUI {
