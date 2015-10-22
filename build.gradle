@@ -24,9 +24,12 @@ version = rootProject.version
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'application'
 apply plugin: 'aversion-util'
 apply plugin: 'aversion-maven'
 apply plugin: 'aversion-apt'
+
+mainClassName = 'me.kenzierocks.anagar.Main'
 
 util {
     javaVersion = '1.7'
