@@ -67,7 +67,7 @@ dependencies {
     addAPTReqWComp group: 'com.google.guava', name: 'guava', version: '18.0'
     addAPT group: 'com.google.auto.factory', name: 'auto-factory', version: '1.0-SNAPSHOT'
     addAPT group: 'com.google.auto.service', name: 'auto-service', version: '1.0-SNAPSHOT'
-    addAPT group: 'com.google.auto.value', name: 'auto-value', version: '1.2-SNAPSHOT'
+    addAPT group: 'com.google.auto.value', name: 'auto-value', version: '1.1'
     addAPTReq name: 'aopalliance'
     addAPTReq name: 'asm'
     addAPTReq name: 'auto-value'
